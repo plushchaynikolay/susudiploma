@@ -1,9 +1,19 @@
 \documentclass[a4paper,14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+\usepackage{listings}
 \usepackage{graphicx}
 \usepackage{multicol}
 \usepackage{geometry}
+\lstset{
+    basicstyle=\small\sffamily,
+    frame=single,
+    tabsize=4,
+    columns=fixed,
+    showstringspaces=false,
+    showtabs=false,
+    keepspaces,
+}
 \graphicspath{ {./static} }
 \geometry{
     a4paper,
@@ -20,9 +30,11 @@
     
     % введение
     % анализ предметной области
+    % \include{src/1_background}
     % проектирование
     % реализация
     % тестирование
+    % \include{src/4_testing}
     % развертывание и внедрение
     % заключение
     % литература
