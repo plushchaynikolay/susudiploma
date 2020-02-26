@@ -14,32 +14,136 @@
     Таким образом, за каждый из этапов обработки сообщения отвечать будет свой отдельный объект,
     а их взаимодействие будет происходить при переходе от одного этапа к другому.
     
+    \subsection{Описание участников обработки сообщений}
     \subsubsection{ApiWorker}
     Объект, ответственный за первый этап - \textit{ApiWorker}. Ответственен за получение
     исходящих сообщений - от пользователя, и входящих сообщений - от оператора и бота.
     Его интерфейс очень прост - это одна функция, которая запускает процесс получения новых сообщений.
     Выглядит интерфейс так, как представлено на листинге ниже.
-    \begin{lstligting}[language=Python]
-        class ApiWorker:
-            def run(self):
-                ...
-    \end{lstligting}
+\begin{lstlisting}[language=Python]
+class ApiWorker:
+    def run(self):
+        raise NotImplementedError
+\end{lstlisting}
 
     \subsubsection{ApiWrapper}
-    Объект, ответственный за превращение сырого сообщения инородного формата в сообщение
-    внутреннего формата проекта. Также 
+    Объект, ответственный за взаимодействие с протоколами обмена сообщениями: IMAP, SMTP, VkLongPoll,
+    Telegram-api и предоставляемого нами api.
+    Он занимается превращением полученного сообщения в сообщение внутреннего формата проекта,
+    обратным превращением перед отправкой сообщения пользователю и собственно отправкой.
+    Его интерфейс выглядит следующим образом:
+\begin{lstlisting}[language=Python]
+class ApiWrapper:
+    @classmethod
+    def convert_from_api_message_type(cls,
+                                      api_message: Any
+                                      ) -> IMessageData:
+        raise NotImplementedError
 
-    Диаграмма процесса обработки сообщения представлена на рисунке ниже.
+    def send_answers(self,
+                     answers: List[Answer]
+                     ) -> List[Answer]:
+        ...
+
+    def send_message(self, message: MessageData) -> MessageData:
+        raise NotImplementedError
+\end{lstlisting}
+    Метод \lstinline{send_answers} отправляет все ответы из списка, дополняя их
+    необходимой информацией от сервера текущего канала. 
+    Метод \lstinline{send_message} отправляет одно отельное сообщения по текущему каналу,
+    возвращает то же сообщение, но дополненное информацией от сервера: реальным временем
+    отправки, идентификатором, который сервер канала обозначил это сообщение и так далее.
+
+    \subsubsection{MessageHandler}
+    Все действия между полученем сообщения в \lstinline{ApiWorker.run} и отправкой ответов
+    в \lstinline{ApiWrapper.send_answers} и сохранением в базу будет скрывать в себе метод
+    \lstinline{MessageHandler.handle}. Для входящих сообщений от пользователя обрабатывать
+    сообщения будет IncomingHandler, для исходящих от оператора и бота - OutgoingHandler.
+    Интерфейс класса MessageHandler представлен в листинге ниже.
+\begin{lstlisting}[language=Python]
+class MessageHandler:
+    @staticmethod
+    def notify(notifiers: Sequence[Type[Notifier]],
+                message: IMessageData,
+                scenarist_response: Optional[ResponseData] = None
+                ) -> None:
+        for notifier in notifiers:
+            notifier.notify(message, scenarist_response)
+
+    def handle(self,
+                message: IMessageData,
+                api_wrapper: ApiWrapper[IMessageData],
+                notifiers: Sequence[Type[Notifier]] = ()
+                ) -> None:
+        raise NotImplementedError
+\end{lstlisting}
+    Метод \lstinline{MessageHandler.notify} здесь исполняет отправку всех уведомлений,
+    которые были переданы ему. Под уведомлениями подразумеваются уведомления других служб
+    о появлении новых сообщений, базы данных, телеграм-логгера и так далее.
+
+    Обработчик входящих сообщений, IncomingHandler, также должен вырабатывать ответ
+    к входящему сообщению. Эту задачу он делегирует другому классу - Scenarist.
+    Дополнительно IncomingHandler может исполнять некоторые действия,
+    в зависимости от выбранного сценария.
+    Общий вид класса IncomingHandler представлен на листинге ниже.
+\begin{lstlisting}[language=Python]
+class IncomingHandler(MessageHandler):
+    def __init__(self, scenarist: IScenarist[IMessageData]):
+        self.scenarist: IScenarist[IMessageData] = scenarist
+
+    def predict(self, message: IMessageData) -> ResponseData:
+        ...
+
+    @classmethod
+    def send_answers(cls,
+                        answers: List[Answer],
+                        api_wrapper: ApiWrapper[IMessageData]
+                        ) -> List[Answer]:
+        ...
+
+    @classmethod
+    def do_actions(cls,
+                    actions: Iterable[Action], 
+                    api_wrapper: ApiWrapper[IMessageData]
+                    ) -> None:
+        for action in actions:
+            action.do(api_wrapper)
+\end{lstlisting}
+
+    \subsubsection{Прочие компоненты}
+    % TODO: Устройство и работа сценариста должны быть описаны более подробно:
+    % извлечение слотов, 
+    IScenarist - интерфейс сценариста, обладает только одним методом:\\
+    \lstinline{IScenarist.run_scenario}, который при реализации, должен будет
+    выработать нужную реакцию (ResponseData) на входящее сообщение с набором
+    нужных ответов (Answer) и действий (Action).
+
+    Задачу предсказания сценарист делегирует классификатору (Classifier),
+    обладающему единственным методом \lstinline{Classifier.predict}, который
+    возвращает объект Prediction с набором меток обнаруженных в тексте сообщения классов.
+    По этим меткам и будет составлена ResponseData внутри сценариста.
+
+    Работа с базой данных через объектно-реляционную модель (ОРМ) будет инкапсулирована
+    в классе DBProvider.
+
+    \subsection{Диаграммы}
+    Теперь, когда мы выполнили описание всех участников обработки сообщений,
+    можем для большей наглядности представить их на диаграмме классов. Сам процесс
+    обработки одного сообщения изобразим на диаграмме процессов.
+
+    Диаграмма классов представлена на рисунке ниже.
     \begin{figure}[!h]
         \centering
+        % TODO
         % \includegraphics[width=\linewidth]{}
         \caption{Функциональная схема исходного проекта}
         \label{fig:func-schema-before}
     \end{figure}
-    
-    Диаграмма классов представлена на рисунке ниже.
+
+    Диаграмма процесса обработки сообщения представлена на рисунке ниже.
     \begin{figure}[!h]
         \centering
+        % TODO
         % \includegraphics[width=\linewidth]{}
         \caption{Функциональная схема исходного проекта}
         \label{fig:func-schema-before}
