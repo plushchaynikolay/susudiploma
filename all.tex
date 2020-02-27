@@ -1,10 +1,9 @@
 \documentclass[a4paper,14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+% \usepackage{biblatex}
+
 \usepackage{listings}
-\usepackage{graphicx}
-\usepackage{multicol}
-\usepackage{geometry}
 \lstset{
     basicstyle=\small\sffamily,
     frame=single,
@@ -14,7 +13,11 @@
     showtabs=false,
     keepspaces,
 }
+
+\usepackage{graphicx}
 \graphicspath{ {./static} }
+
+\usepackage{geometry}
 \geometry{
     a4paper,
     total={170mm,257mm},
@@ -29,17 +32,20 @@
     \tableofcontents
     
     % введение
+    \include{src/0_intorduction}
     % анализ предметной области
     \include{src/1_background}
     % проектирование
     \include{src/2_design}
     % реализация
+    \include{src/3_implementation}
     % тестирование
     \include{src/4_testing}
     % развертывание и внедрение
+    \include{src/5_deployment}
     % заключение
+    \include{src/6_conclusion}
     % литература
-
-    % приложение
+    % \include{src/bibliography}
 
 \end{document}
