@@ -1,1 +1,64 @@
 \section{РЕАЛИЗАЦИЯ}
+    \subsection{Уведомления}
+    Выполнение несрочных задач в проекте выполняется менеджером отложенных задач \textit(Celery):
+    это широко известный кроссплатформенный проект с открытым исходным кодом на Python для
+    асинхронного выполения задач через вызов удаленных процедур. В качестве брокера задач мы используем RabbitMQ.
+    Для добавления задач в очередь в нашем проекте используются "уведомления" (\textit{Notifier}).
+    Перечислим все виды уведомлений, которые существут на настоящий момент:
+    \begin{itemize}
+        \item \textit{DataBaseMessageNotifier} - сохранение сообщения в базу;
+        \item \textit{DataBaseResponseNotifier} - сохранение ответов в базу;
+        \item \textit{DataBaseCarefulNotifier} - сохранение сообщения в базу, если оно ещё не существует;
+        \item \textit{AppLogerNotifier} - уведомление о некоторых событиях в мессенджер.
+    \end{itemize}
+    Пример реализации сохрания в базу представлен на листинге ниже.
+\begin{lstlisting}[language=Python]
+class DataBaseMessageNotifier(Notifier):
+    """Сохранение сообщений в базу"""
+    @staticmethod
+    def notify(message: MessageData, scenarist_response: Optional[ResponseData] = None) -> None:
+        celery_app.send_task('chat_bot.tasks.save_to_db',
+                             args=(message.to_dict(),))
+\end{lstlisting}
+    Сама Celery-задача выглядит следующим образом:
+\begin{lstlisting}[language=Python]
+@celery_app.task(name='chat_bot.tasks.save_to_db')
+def save_to_db(json_message: Mapping[str, Any]) -> None:
+    message = MessageData.from_dict(json_message, [EmailMessageData])
+    DBProvider.save(message)
+\end{lstlisting}
+
+    \subsection{Работа с базой}
+    В работе с базой данных участвуют две сущности: объектно-реляционная модель Message
+    и класс инкапсулирующий работу с базой DBProvider.
+    Модель Message выглядит следующим образом:
+\begin{lstlisting}[language=Python]
+class Message:
+    class Meta:
+        db_table = 'messages'
+        constraints = [
+            models.UniqueConstraint(fields=['source', 'source_message_id'],
+                                    name='messages_source_source_message_id_key')
+        ]
+    id = models.AutoField(primary_key=True)
+    chat_id = models.CharField(max_length=50, null=True)
+    source = models.CharField(max_length=50, null=False)
+    datetime = models.DateTimeField(null=False)
+    text = models.TextField(null=True)
+    sender = models.CharField(max_length=10, null=False)
+    is_answered = models.BooleanField(null=True)
+    prediction = JSONField(null=True)
+    correctly_answered = models.BooleanField(null=True)
+    categories = ArrayField(models.IntegerField(), null=True)
+    source_message_id = models.CharField(max_length=50, null=True)
+\end{lstlisting}
+    DBProvider - это довольно большой статический класс, реализующий как получение исории сообщений,
+    так и сохранение новых сообщений в базу.
+
+    \subsection{Датаклассы}
+    \subsection{Канал Телеграма}
+    \subsection{Канал Вконтакте}
+    \subsection{Канал почты}
+    \subsection{Сцерарист и сценарии}
+    \subsection{Обработчик}
+    \subsection*{Вывод по главе 3}
