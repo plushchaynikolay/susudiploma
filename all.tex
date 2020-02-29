@@ -5,7 +5,7 @@
 
 \usepackage{listings}
 \lstset{
-    basicstyle=\scriptsize\ttfamily,
+    basicstyle=\footnotesize\ttfamily,
     frame=single,
     tabsize=4,
     columns=fixed,
@@ -13,6 +13,7 @@
     showtabs=false,
     keepspaces,
 }
+\newcommand{\inlinecode}{\lstinline[basicstyle=\normalsize\ttfamily]}
 
 \usepackage{graphicx}
 \graphicspath{ {./static} }
@@ -40,9 +41,9 @@
     % реализация
     \include{src/3_implementation}
     % тестирование
-    \include{src/4_testing}
+    % \include{src/4_testing}
     % развертывание и внедрение
-    \include{src/5_deployment}
+    % \include{src/5_deployment}
     % заключение
     \include{src/6_conclusion}
     % литература

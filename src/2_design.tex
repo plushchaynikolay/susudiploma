@@ -16,7 +16,7 @@
     
     \subsection{Описание участников обработки сообщений}
     \subsubsection*{ApiWorker}
-    Объект, ответственный за первый этап - \textit{ApiWorker}. Ответственен за получение
+    Объект, ответственный за первый этап - \inlinecode{ApiWorker}. Ответственен за получение
     исходящих сообщений - от пользователя, и входящих сообщений - от оператора и бота.
     Его интерфейс очень прост - это одна функция, которая запускает процесс получения новых сообщений.
     Выглядит интерфейс так, как представлено на листинге ниже.
@@ -35,7 +35,9 @@ class ApiWorker:
 \begin{lstlisting}[language=Python]
 class ApiWrapper:
     @classmethod
-    def convert_from_api_message_type(cls, api_message: Any) -> IMessageData:
+    def convert_from_api_message_type(cls,
+                                      api_message: Any
+                                      ) -> IMessageData:
         raise NotImplementedError
 
     def send_answers(self, answers: List[Answer]) -> List[Answer]:
@@ -44,16 +46,16 @@ class ApiWrapper:
     def send_message(self, message: MessageData) -> MessageData:
         raise NotImplementedError
 \end{lstlisting}
-    Метод \lstinline{send_answers} отправляет все ответы из списка, дополняя их
+    Метод \inlinecode{send_answers} отправляет все ответы из списка, дополняя их
     необходимой информацией от сервера текущего канала. 
-    Метод \lstinline{send_message} отправляет одно отельное сообщения по текущему каналу,
+    Метод \inlinecode{send_message} отправляет одно отельное сообщения по текущему каналу,
     возвращает то же сообщение, но дополненное информацией от сервера: реальным временем
     отправки, идентификатором, который сервер канала обозначил это сообщение и так далее.
 
     \subsubsection*{MessageHandler}
-    Все действия между полученем сообщения в \lstinline{ApiWorker.run} и отправкой ответов
-    в \lstinline{ApiWrapper.send_answers} и сохранением в базу будет скрывать в себе метод
-    \lstinline{MessageHandler.handle}. Для входящих сообщений от пользователя обрабатывать
+    Все действия между полученем сообщения в \inlinecode{ApiWorker.run} и отправкой ответов
+    в \inlinecode{ApiWrapper.send_answers} и сохранением в базу будет скрывать в себе метод
+    \inlinecode{MessageHandler.handle}. Для входящих сообщений от пользователя обрабатывать
     сообщения будет IncomingHandler, для исходящих от оператора и бота - OutgoingHandler.
     Интерфейс класса MessageHandler представлен в листинге ниже.
 \begin{lstlisting}[language=Python]
@@ -73,7 +75,7 @@ class MessageHandler:
                 ) -> None:
         raise NotImplementedError
 \end{lstlisting}
-    Метод \lstinline{MessageHandler.notify} здесь исполняет отправку всех уведомлений,
+    Метод \inlinecode{MessageHandler.notify} здесь исполняет отправку всех уведомлений,
     которые были переданы ему. Под уведомлениями подразумеваются уведомления других служб
     о появлении новых сообщений, базы данных, телеграм-логгера и так далее.
 
@@ -110,12 +112,12 @@ class IncomingHandler(MessageHandler):
     % TODO: Устройство и работа сценариста должны быть описаны более подробно:
     % извлечение слотов, 
     IScenarist - интерфейс сценариста, обладает только одним методом:\\
-    \lstinline{IScenarist.run_scenario}, который при реализации, должен будет
+    \inlinecode{IScenarist.run_scenario}, который при реализации, должен будет
     выработать нужную реакцию (ResponseData) на входящее сообщение с набором
     нужных ответов (Answer) и действий (Action).
 
     Задачу предсказания сценарист делегирует классификатору (Classifier),
-    обладающему единственным методом \lstinline{Classifier.predict}, который
+    обладающему единственным методом \inlinecode{Classifier.predict}, который
     возвращает объект Prediction с набором меток обнаруженных в тексте сообщения классов.
     По этим меткам и будет составлена ResponseData внутри сценариста.
 

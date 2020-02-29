@@ -3,20 +3,21 @@
     Выполнение несрочных задач в проекте выполняется менеджером отложенных задач \textit(Celery):
     это широко известный кроссплатформенный проект с открытым исходным кодом на Python для
     асинхронного выполения задач через вызов удаленных процедур. В качестве брокера задач мы используем RabbitMQ.
-    Для добавления задач в очередь в нашем проекте используются "уведомления" (\textit{Notifier}).
+    Для добавления задач в очередь в нашем проекте используются "уведомления" (\inlinecode{Notifier}).
     Перечислим все виды уведомлений, которые существуют на настоящий момент:
     \begin{itemize}
-        \item \textit{DataBaseMessageNotifier} - сохранение сообщения в базу;
-        \item \textit{DataBaseResponseNotifier} - сохранение ответов в базу;
-        \item \textit{DataBaseCarefulNotifier} - сохранение сообщения в базу, если оно ещё не существует;
-        \item \textit{AppLogerNotifier} - уведомление о некоторых событиях в мессенджер.
+        \item \inlinecode{DataBaseMessageNotifier} - сохранение сообщения в базу;
+        \item \inlinecode{DataBaseResponseNotifier} - сохранение ответов в базу;
+        \item \inlinecode{DataBaseCarefulNotifier} - сохранение сообщения в базу, если оно ещё не существует;
+        \item \inlinecode{AppLogerNotifier} - уведомление о некоторых событиях в мессенджер.
     \end{itemize}
     Пример реализации сохрания в базу представлен на листинге ниже.
 \begin{lstlisting}[language=Python]
 class DataBaseMessageNotifier(Notifier):
     @staticmethod
     def notify(message: MessageData,
-               scenarist_response: Optional[ResponseData] = None) -> None:
+               scenarist_response: Optional[ResponseData] = None
+               ) -> None:
         celery_app.send_task('chat_bot.tasks.save_to_db',
                              args=(message.to_dict(),))
 \end{lstlisting}
@@ -62,29 +63,32 @@ class Message:
 class DBProvider:
     def get_history(cls, chat_id: str, 
                     columns: Iterable[str]) -> Optional[History]: ...
-    def _load_history(chat_id: str, columns: Iterable[str]) -> History: ...
-    def get_latest_datetime(**kwargs: str) -> Optional[timezone.datetime]: ...
+    def _load_history(chat_id: str, 
+                      columns: Iterable[str]) -> History: ...
+    def get_latest_datetime(**kwargs: str
+                            ) -> Optional[timezone.datetime]: ...
     def save(cls, message: MessageData) -> None: ...
     def get_or_create(cls, message: MessageData) -> bool: ...
     def update_or_create(cls, message: MessageData) -> bool: ...
     def _save(message: MessageData, 
-              need_check: bool = False, update: bool = False) -> bool: ...
+              need_check: bool = False, 
+              update: bool = False) -> bool: ...
 \end{lstlisting}
 
     Рассмотрим подробнее методы этого класса:
     \begin{itemize}
-        \item \textit{get_history} - публичный метод для получения истории диалога, осуществляет
+        \item \inlinecode{get_history} - публичный метод для получения истории диалога, осуществляет
         безопасную выгрузку истории чата из базы данных, обрабатывая возникающие исключения;
-        \item \textit{_load_history} - приватный метод, реализующий непосредственную загрузку истории из базы,
-        устанавливает временной диапазон истории и формирует результат в надлежащий вид.
-        \item \textit{get_latest_datetime} - метод получения информации о времени последнего сообщения
-        в канале или чате, от пользователя, оператора или бота.
-        \item \textit{save} - сохранение нового сообщения в базе, реализует SQL-функцию `INSERT`.
-        \item \textit{get_or_create} - создание записи о сообщении в базе, если в этом канале сообщения с таким
-        идентификатором ещё не существует, реализует SQL-функцию `IF NOT EXISTS INSERT`.
-        \item \textit{update_or_create} - обновление записи в базе о сообщении определенного канала с таким
-        идентификатором, либо создание новой записи, реализует SQL-функцию `IF EXISTS UPDATE ELSE INSERT`
-        \item \textit{_save} - непосредственная реализация три перечисленные выше функции, выбирая нужный
+        \item \inlinecode{_load_history} - приватный метод, реализующий непосредственную загрузку истории из базы,
+        устанавливает временной диапазон истории и формирует результат в надлежащий вид;
+        \item \inlinecode{get_latest_datetime} - метод получения информации о времени последнего сообщения
+        в канале или чате, от пользователя, оператора или бота;
+        \item \inlinecode{save} - сохранение нового сообщения в базе, реализует SQL-функцию \inlinecode{INSERT};
+        \item \inlinecode{get_or_create} - создание записи о сообщении в базе, если в этом канале сообщения с таким
+        идентификатором ещё не существует, реализует SQL-функцию \inlinecode{IF NOT EXISTS INSERT};
+        \item \inlinecode{update_or_create} - обновление записи в базе о сообщении определенного канала с таким
+        идентификатором, либо создание новой записи, реализует SQL-функцию \inlinecode{IF EXISTS UPDATE ELSE INSERT};
+        \item \inlinecode{_save} - непосредственная реализация три перечисленные выше функции, выбирая нужный
         метод библиотеки \textit{Django} подставляет нужные фильтры поиска и значения для создания
         или обновления записи.
     \end{itemize}
@@ -94,7 +98,7 @@ class DBProvider:
     Это усовершенствованный синтаксис для описания собственных типов и структур данных.
     В проекте существуют несколько представителей датаклассов. Опишем отдельно каждого из них.
     \begin{enumerate}
-        \item \textit{MessageData} - датакласс для описания сообщений входящих и исходящих,
+        \item \inlinecode{MessageData} - датакласс для описания сообщений входящих и исходящих,
         содержит всю необходимую для работы обработчика, сценариста и других классов информацию:
         идентификатор чата, название канала-источника, время получения, отправителя,
         список классифицированных категорий, а также некоторые флаги и идентификаторы.
@@ -113,7 +117,7 @@ class MessageData(SerializableMixin):
     source_chat_id: Optional[str] = None
 \end{lstlisting}
 
-        \item \textit{Answer} - контейнер с ответом бота на входящее сообщение.
+        \item \inlinecode{Answer} - контейнер с ответом бота на входящее сообщение.
 \begin{lstlisting}[language=Python]
 @dataclass
 class Answer(SerializableMixin):
@@ -121,7 +125,7 @@ class Answer(SerializableMixin):
     message: MessageData
 \end{lstlisting}
 
-        \item \textit{Prediction} - контейнер с результатами классификации текста сообщения,
+        \item \inlinecode{Prediction} - контейнер с результатами классификации текста сообщения,
         которые возвращает классификатор.
 \begin{lstlisting}[language=Python]
 @dataclass
@@ -130,14 +134,15 @@ class Prediction(SerializableMixin):
     probabilities: Optional[Dict[str, float]]
 \end{lstlisting}
 
-        \item \textit{ResponseData} - датакласс со всем, что нужно боту, чтобы корректно
+        \item \inlinecode{ResponseData} - датакласс со всем, что нужно боту, чтобы корректно
         среагировать на входящее сообщение пользователя.
 \begin{lstlisting}[language=Python]
 @dataclass
 class ResponseData(SerializableMixin):
     prediction: Prediction = field(default=Prediction([], None))
     answers: List[Answer] = field(default_factory=list)
-    after_answer_actions: List[Action] = field(default_factory=list)
+    after_answer_actions: List[Action] = field(
+        default_factory=list)
 \end{lstlisting}
     \end{enumerate}
 
