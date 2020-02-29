@@ -1,32 +1,35 @@
-\documentclass[a4paper,14pt,oneside]{extarticle}
+\documentclass[14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 % \usepackage{biblatex}
-
-\usepackage{listings}
-\lstset{
-    basicstyle=\footnotesize\ttfamily,
-    frame=single,
-    tabsize=4,
-    columns=fixed,
-    showstringspaces=false,
-    showtabs=false,
-    keepspaces,
-}
-\newcommand{\inlinecode}{\lstinline[basicstyle=\normalsize\ttfamily]}
-
-\usepackage{graphicx}
-\graphicspath{ {./static} }
-
 \usepackage{geometry}
 \geometry{
     a4paper,
     total={170mm,257mm},
     left=30mm,
     top=20mm,
-    right=20mm,
+    right=15mm,
     bottom=20mm,
 }
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand\headrulewidth{0pt} % no line between document and header
+\fancyhead{} % clear header
+\fancyfoot{} % clear footer
+\fancyfoot[LE,RO]{\thepage}
+
+\usepackage{listings}
+\lstset{
+    basicstyle=\footnotesize\ttfamily,
+    frame=single,
+    tabsize=4,
+}
+\newcommand{\inlinecode}{\lstinline[basicstyle=\normalsize\ttfamily]}
+
+\usepackage{graphicx}
+\graphicspath{ {./static} }
+
 
 \begin{document}
     \include{src/title}
