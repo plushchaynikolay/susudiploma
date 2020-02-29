@@ -4,7 +4,7 @@
     это широко известный кроссплатформенный проект с открытым исходным кодом на Python для
     асинхронного выполения задач через вызов удаленных процедур. В качестве брокера задач мы используем RabbitMQ.
     Для добавления задач в очередь в нашем проекте используются "уведомления" (\textit{Notifier}).
-    Перечислим все виды уведомлений, которые существут на настоящий момент:
+    Перечислим все виды уведомлений, которые существуют на настоящий момент:
     \begin{itemize}
         \item \textit{DataBaseMessageNotifier} - сохранение сообщения в базу;
         \item \textit{DataBaseResponseNotifier} - сохранение ответов в базу;
@@ -57,8 +57,90 @@ class Message:
 
     DBProvider - это довольно большой статический класс, реализующий как получение исории сообщений,
     так и сохранение новых сообщений в базу.
+    Структура класса приведена на листинге ниже.
+\begin{lstlisting}[language=Python]
+class DBProvider:
+    def get_history(cls, chat_id: str, 
+                    columns: Iterable[str]) -> Optional[History]: ...
+    def _load_history(chat_id: str, columns: Iterable[str]) -> History: ...
+    def get_latest_datetime(**kwargs: str) -> Optional[timezone.datetime]: ...
+    def save(cls, message: MessageData) -> None: ...
+    def get_or_create(cls, message: MessageData) -> bool: ...
+    def update_or_create(cls, message: MessageData) -> bool: ...
+    def _save(message: MessageData, 
+              need_check: bool = False, update: bool = False) -> bool: ...
+\end{lstlisting}
+
+    Рассмотрим подробнее методы этого класса:
+    \begin{itemize}
+        \item \textit{get_history} - публичный метод для получения истории диалога, осуществляет
+        безопасную выгрузку истории чата из базы данных, обрабатывая возникающие исключения;
+        \item \textit{_load_history} - приватный метод, реализующий непосредственную загрузку истории из базы,
+        устанавливает временной диапазон истории и формирует результат в надлежащий вид.
+        \item \textit{get_latest_datetime} - метод получения информации о времени последнего сообщения
+        в канале или чате, от пользователя, оператора или бота.
+        \item \textit{save} - сохранение нового сообщения в базе, реализует SQL-функцию `INSERT`.
+        \item \textit{get_or_create} - создание записи о сообщении в базе, если в этом канале сообщения с таким
+        идентификатором ещё не существует, реализует SQL-функцию `IF NOT EXISTS INSERT`.
+        \item \textit{update_or_create} - обновление записи в базе о сообщении определенного канала с таким
+        идентификатором, либо создание новой записи, реализует SQL-функцию `IF EXISTS UPDATE ELSE INSERT`
+        \item \textit{_save} - непосредственная реализация три перечисленные выше функции, выбирая нужный
+        метод библиотеки \textit{Django} подставляет нужные фильтры поиска и значения для создания
+        или обновления записи.
+    \end{itemize}
 
     \subsection{Датаклассы}
+    С версией \textit{Python 3.8} в синтаксис языка были введены датаклассы (\textit{dataclasses}).
+    Это усовершенствованный синтаксис для описания собственных типов и структур данных.
+    В проекте существуют несколько представителей датаклассов. Опишем отдельно каждого из них.
+    \begin{enumerate}
+        \item \textit{MessageData} - датакласс для описания сообщений входящих и исходящих,
+        содержит всю необходимую для работы обработчика, сценариста и других классов информацию:
+        идентификатор чата, название канала-источника, время получения, отправителя,
+        список классифицированных категорий, а также некоторые флаги и идентификаторы.
+\begin{lstlisting}[language=Python]
+@dataclass
+class MessageData(SerializableMixin):
+    chat_id: str = ''
+    source: str = ''
+    timestamp: Optional[datetime] = None
+    text: str = ''
+    sender: Optional[str] = None
+    is_answered: Optional[bool] = None
+    categories: List[int] = field(default_factory=list)
+    prediction: Optional[Dict[str, float]] = None
+    source_message_id: Optional[str] = None
+    source_chat_id: Optional[str] = None
+\end{lstlisting}
+
+        \item \textit{Answer} - контейнер с ответом бота на входящее сообщение.
+\begin{lstlisting}[language=Python]
+@dataclass
+class Answer(SerializableMixin):
+    category: str
+    message: MessageData
+\end{lstlisting}
+
+        \item \textit{Prediction} - контейнер с результатами классификации текста сообщения,
+        которые возвращает классификатор.
+\begin{lstlisting}[language=Python]
+@dataclass
+class Prediction(SerializableMixin):
+    categories: List[str]
+    probabilities: Optional[Dict[str, float]]
+\end{lstlisting}
+
+        \item \textit{ResponseData} - датакласс со всем, что нужно боту, чтобы корректно
+        среагировать на входящее сообщение пользователя.
+\begin{lstlisting}[language=Python]
+@dataclass
+class ResponseData(SerializableMixin):
+    prediction: Prediction = field(default=Prediction([], None))
+    answers: List[Answer] = field(default_factory=list)
+    after_answer_actions: List[Action] = field(default_factory=list)
+\end{lstlisting}
+    \end{enumerate}
+
     \subsection{Канал Телеграма}
     \subsection{Канал Вконтакте}
     \subsection{Канал почты}
