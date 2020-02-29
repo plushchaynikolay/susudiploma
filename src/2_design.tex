@@ -12,7 +12,7 @@
     \end{enumerate}
 
     Таким образом, за каждый из этапов обработки сообщения отвечать будет свой отдельный объект,
-    а их взаимодействие будет происходить при переходе от одного этапа к другому.
+    а взаимодействие этих объектов будет происходить при переходе от одного этапа к другому.
     
     \subsection{Описание участников обработки сообщений}
     \subsubsection*{ApiWorker}
@@ -35,14 +35,10 @@ class ApiWorker:
 \begin{lstlisting}[language=Python]
 class ApiWrapper:
     @classmethod
-    def convert_from_api_message_type(cls,
-                                      api_message: Any
-                                      ) -> IMessageData:
+    def convert_from_api_message_type(cls, api_message: Any) -> IMessageData:
         raise NotImplementedError
 
-    def send_answers(self,
-                     answers: List[Answer]
-                     ) -> List[Answer]:
+    def send_answers(self, answers: List[Answer]) -> List[Answer]:
         ...
 
     def send_message(self, message: MessageData) -> MessageData:
@@ -96,16 +92,16 @@ class IncomingHandler(MessageHandler):
 
     @classmethod
     def send_answers(cls,
-                        answers: List[Answer],
-                        api_wrapper: ApiWrapper[IMessageData]
-                        ) -> List[Answer]:
+                     answers: List[Answer],
+                     api_wrapper: ApiWrapper[IMessageData]
+                     ) -> List[Answer]:
         ...
 
     @classmethod
     def do_actions(cls,
-                    actions: Iterable[Action], 
-                    api_wrapper: ApiWrapper[IMessageData]
-                    ) -> None:
+                   actions: Iterable[Action], 
+                   api_wrapper: ApiWrapper[IMessageData]
+                   ) -> None:
         for action in actions:
             action.do(api_wrapper)
 \end{lstlisting}
