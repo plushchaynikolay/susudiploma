@@ -33,6 +33,8 @@ def save_to_db(json_message: Mapping[str, Any]) -> None:
     \subsection{Работа с базой}
     В работе с базой данных участвуют две сущности: объектно-реляционная модель Message
     и класс инкапсулирующий работу с базой DBProvider.
+
+    \newpage
     Модель Message выглядит следующим образом:
 \begin{lstlisting}[language=Python]
 class Message:
@@ -88,8 +90,8 @@ class DBProvider:
         идентификатором ещё не существует, реализует SQL-функцию \inlinecode{IF NOT EXISTS INSERT};
         \item \inlinecode{update_or_create} -- обновление записи в базе о сообщении определенного канала с таким
         идентификатором, либо создание новой записи, реализует SQL-функцию \inlinecode{IF EXISTS UPDATE ELSE INSERT};
-        \item \inlinecode{_save} -- непосредственная реализация три перечисленные выше функции, выбирая нужный
-        метод библиотеки \textit{Django} подставляет нужные фильтры поиска и значения для создания
+        \item \inlinecode{_save} -- непосредственная реализация трех перечисленных выше функций,
+        выбирая нужный метод библиотеки \textit{Django} подставляет нужные фильтры поиска и значения для создания
         или обновления записи.
     \end{itemize}
 
@@ -158,7 +160,7 @@ class ResponseData(SerializableMixin):
     телеграм клиента.
     Обработка сообщений заключается в их преобразовании во внутренний тип \inlinecode{MessageData}
     и передаче обработчику в \inlinecode{IncomingHandler} или в \inlinecode{OutgoingHandler}.
-    Класс \inlinecode{TelegramApiWrapper} наследуется от базового класса \inlinecode{ApiWrapper},
+    \inlinecode{TelegramApiWrapper} наследуется от базового класса \inlinecode{ApiWrapper},
     реализует его абстрактные методы \inlinecode{send_message} и \inlinecode{convert_from_api_message_type}.
 
     \subsection{Канал Вконтакте}
