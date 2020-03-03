@@ -1,7 +1,8 @@
 \documentclass[14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
-% \usepackage{biblatex}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{src/bibliography.bib}
 \usepackage{geometry}
 \geometry{
     a4paper,
@@ -52,5 +53,7 @@
     \include{src/6_conclusion}
     % литература
     % \include{src/bibliography}
+    \addcontentsline{toc}{section}{Библиографический список}
+    \printbibliography[title={Библиографический список}]
 
 \end{document}

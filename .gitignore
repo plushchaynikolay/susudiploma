@@ -6,3 +6,7 @@ example
 *.pdf
 *.log
 *.toc
+*.bbl
+*.bcf
+*.blg
+*.run.xml
