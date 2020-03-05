@@ -2,7 +2,7 @@
     \subsection{Уведомления}
     Выполнение несрочных задач в проекте выполняется менеджером отложенных задач \textit(Celery):
     это широко известный кроссплатформенный проект с открытым исходным кодом на Python для
-    асинхронного выполения задач через вызов удаленных процедур.
+    асинхронного выполнения задач через вызов удаленных процедур.
     В качестве брокера задач мы используем RabbitMQ\cite{docs.rabbitmq}.
     Для добавления задач в очередь в нашем проекте используются "уведомления" (\inlinecode{Notifier}).
     Перечислим все виды уведомлений, которые существуют на настоящий момент:
@@ -12,24 +12,23 @@
         \item \inlinecode{DataBaseCarefulNotifier} -- сохранение сообщения в базу, если оно ещё не существует;
         \item \inlinecode{AppLogerNotifier} -- уведомление о некоторых событиях в мессенджер.
     \end{itemize}
-    Пример реализации сохрания в базу представлен на листинге ниже.
-\begin{lstlisting}[language=Python]
-class DataBaseMessageNotifier(Notifier):
-    @staticmethod
-    def notify(message: MessageData,
-               scenarist_response: Optional[ResponseData] = None
-               ) -> None:
-        celery_app.send_task('chat_bot.tasks.save_to_db',
-                             args=(message.to_dict(),))
-\end{lstlisting}
+    Пример реализации сохранения в базу представлен на листинге ниже.
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/data_base_message_notifier.py}
+        \caption{Код класса DataBaseMessageNotifier}
+        \label{fig:data_base_message_notifier}
+    \end{figure}
 
     Сама Celery-задача выглядит следующим образом:
-\begin{lstlisting}[language=Python]
-@celery_app.task(name='chat_bot.tasks.save_to_db')
-def save_to_db(json_message: Mapping[str, Any]) -> None:
-    message = MessageData.from_dict(json_message, [EmailMessageData])
-    DBProvider.save(message)
-\end{lstlisting}
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/celery_task.py}
+        \caption{Код метода-задачи Celery save_to_db}
+        \label{fig:celery_task}
+    \end{figure}
 
     \subsection{Работа с базой}
     В работе с базой данных участвуют две сущности: объектно-реляционная модель Message
@@ -37,46 +36,24 @@ def save_to_db(json_message: Mapping[str, Any]) -> None:
 
     \newpage
     Модель Message выглядит следующим образом:
-\begin{lstlisting}[language=Python]
-class Message:
-    class Meta:
-        db_table = 'messages'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['source', 'source_message_id'],
-                name='messages_source_source_message_id_key')
-        ]
-    id = models.AutoField(primary_key=True)
-    chat_id = models.CharField(max_length=50, null=True)
-    source = models.CharField(max_length=50, null=False)
-    datetime = models.DateTimeField(null=False)
-    text = models.TextField(null=True)
-    sender = models.CharField(max_length=10, null=False)
-    is_answered = models.BooleanField(null=True)
-    prediction = JSONField(null=True)
-    correctly_answered = models.BooleanField(null=True)
-    categories = ArrayField(models.IntegerField(), null=True)
-    source_message_id = models.CharField(max_length=50, null=True)
-\end{lstlisting}
 
-    DBProvider -- это довольно большой статический класс, реализующий как получение исории сообщений,
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/message_model.py}
+        \caption{Код ОРМ класса Message}
+        \label{fig:message_model}
+    \end{figure}
+
+    DBProvider -- это довольно большой статический класс, реализующий как получение истории сообщений,
     так и сохранение новых сообщений в базу.
     Структура класса приведена на листинге ниже.
-\begin{lstlisting}[language=Python]
-class DBProvider:
-    def get_history(cls, chat_id: str, 
-                    columns: Iterable[str]) -> Optional[History]: ...
-    def _load_history(chat_id: str, 
-                      columns: Iterable[str]) -> History: ...
-    def get_latest_datetime(**kwargs: str
-                            ) -> Optional[timezone.datetime]: ...
-    def save(cls, message: MessageData) -> None: ...
-    def get_or_create(cls, message: MessageData) -> bool: ...
-    def update_or_create(cls, message: MessageData) -> bool: ...
-    def _save(message: MessageData, 
-              need_check: bool = False, 
-              update: bool = False) -> bool: ...
-\end{lstlisting}
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/dbprovider.py}
+        \caption{Код класса DBProvider}
+        \label{fig:dbprovider}
+    \end{figure}
 
     Рассмотрим подробнее методы этого класса:
     \begin{itemize}
@@ -106,74 +83,69 @@ class DBProvider:
         содержит всю необходимую для работы обработчика, сценариста и других классов информацию:
         идентификатор чата, название канала-источника, время получения, отправителя,
         список классифицированных категорий, а также некоторые флаги и идентификаторы.
-\begin{lstlisting}[language=Python]
-@dataclass
-class MessageData(SerializableMixin):
-    chat_id: str = ''
-    source: str = ''
-    timestamp: Optional[datetime] = None
-    text: str = ''
-    sender: Optional[str] = None
-    is_answered: Optional[bool] = None
-    categories: List[int] = field(default_factory=list)
-    prediction: Optional[Dict[str, float]] = None
-    source_message_id: Optional[str] = None
-    source_chat_id: Optional[str] = None
-\end{lstlisting}
+
+        \begin{figure}[!h]
+            \centering
+            \lstinputlisting[language=Python]{snippets/messagedata.py}
+            \caption{Код класса MessageData}
+            \label{fig:messagedata}
+        \end{figure}
 
         \item \inlinecode{Answer} -- контейнер с ответом бота на входящее сообщение.
-\begin{lstlisting}[language=Python]
-@dataclass
-class Answer(SerializableMixin):
-    category: str
-    message: MessageData
-\end{lstlisting}
+
+        \begin{figure}[!h]
+            \centering
+            \lstinputlisting[language=Python]{snippets/answer.py}
+            \caption{Код класса Answer}
+            \label{fig:answer}
+        \end{figure}
 
         \item \inlinecode{Prediction} -- контейнер с результатами классификации текста сообщения,
         которые возвращает классификатор.
-\begin{lstlisting}[language=Python]
-@dataclass
-class Prediction(SerializableMixin):
-    categories: List[str]
-    probabilities: Optional[Dict[str, float]]
-\end{lstlisting}
+
+        \begin{figure}[!h]
+            \centering
+            \lstinputlisting[language=Python]{snippets/prediction.py}
+            \caption{Код класса Prediction}
+            \label{fig:prediction}
+        \end{figure}
 
         \item \inlinecode{ResponseData} -- датакласс со всем, что нужно боту, чтобы корректно
         среагировать на входящее сообщение пользователя.
-\begin{lstlisting}[language=Python]
-@dataclass
-class ResponseData(SerializableMixin):
-    prediction: Prediction = field(default=Prediction([], None))
-    answers: List[Answer] = field(default_factory=list)
-    after_answer_actions: List[Action] = field(
-        default_factory=list)
-\end{lstlisting}
+
+        \begin{figure}[!h]
+            \centering
+            \lstinputlisting[language=Python]{snippets/responsedata.py}
+            \caption{Код класса ResponseData}
+            \label{fig:responsedata}
+        \end{figure}
+
     \end{enumerate}
 
-    \subsection{Канал Телеграма}
+    \subsection{Канал telegram}
     Так как за обработку отложенных действий теперь отвечает менеджер задач \textit{Celery},
     исчезла потребность в асинхронной обработке сообщений, мы отказались от асинхронности.
     Это позволяет использовать синхронные библиотеки, выбор которых гораздо больше,
     а логика синхронных приложений гораздо проще для понимания.
-    В новой реализации Телеграм-канала была использована другая библиотека -- \textit{pyrogram}\cite{docs.pyrogram}.
+    В новой реализации telegram-канала была использована другая библиотека -- \textit{pyrogram}\cite{docs.pyrogram}.
     Структура \inlinecode{TelegramWorker} осталась примерно той же: два фильтра событий и две функции, описывающие
     обработку входящих и исходящих сообщений подаются в цикл обработки событий (\textit{event loop})
-    телеграм клиента.
+    telegram клиента.
     Обработка сообщений заключается в их преобразовании во внутренний тип \inlinecode{MessageData}
     и передаче обработчику в \inlinecode{IncomingHandler} или в \inlinecode{OutgoingHandler}.
     \inlinecode{TelegramApiWrapper} наследуется от базового класса \inlinecode{ApiWrapper},
     реализует его абстрактные методы \inlinecode{send_message} и \inlinecode{convert_from_api_message_type}.
 
-    \subsection{Канал Вконтакте}
-    Для реализации канала Вконтакте используется
+    \subsection{Канал ВКонтакте}
+    Для реализации канала ВКонтакте используется
     библиотека \textit{vk\_api}\cite{docs.vkapi}.
     Для получения сообщений используется технология LongPoll, в которой, после
     установления соединения и начала сессии, клиент получает
-    от сервера Вконтакте уведомления о всех новых событиях в беседе.
+    от сервера ВКонтакте уведомления о всех новых событиях в беседе.
     У каждого нового события проверяется
     является ли оно сообщением, а также поле \inlinecode{to_me}, из которого определяется каким образом
     должно обрабатываться сообщение, как входящее или исходящее.
-    Обработка сообщений, также как и в случае с телеграмом, заключается в их преобразовании во внутренний тип
+    Обработка сообщений, также как и в случае с telegram, заключается в их преобразовании во внутренний тип
     и передаче одному из обработчиков.
 
     \subsection{Канал почты}
@@ -183,7 +155,7 @@ class ResponseData(SerializableMixin):
     канала почты, со специальными полями, и класс \inlinecode{EmailMessageBuilder} для создания объекта датакласса.
     Дополнительно были созданы классы обертки над библиотеками \textit{imap} и \textit{smtp}, в которых
     реализован алгоритм установления и проверки соединения и переподключения в случае его разрыва.
-    На почте присутсвует сложная логика, связанная пометкой обработанных ботом сообщений флажком
+    На почте присутствует сложная логика, связанная пометкой обработанных ботом сообщений флажком
     и перекладыванием отвеченных сообщений в отдельную папку. Дополнительно ситуация осложняется тем, что
     одновременно в одном почтовом ящике могут работать кроме бота ещё два оператора и сторонний парсер почты,
     из-за чего часто возникают конфликтные ситуации. Ситуации могут выражаться, например в прочтении и снятии флага
@@ -194,18 +166,18 @@ class ResponseData(SerializableMixin):
     Диалоговая система в целом не перенесла существенных изменений, так как целью рефакторинга не ставилось
     улучшение точности или полноты распознавания. Изменения претерпел только модуль для сборки модели.
     Он был перенесен в рабочий проект целиком, практически без изменений, в корневую директорию нового проекта.
-    В перую очередь, это было нужно, чтобы решить проблему импортов библиотек при распаковке модели.
+    В первую очередь, это было нужно, чтобы решить проблему импортов библиотек при распаковке модели.
     Дело в том, что для сериализации модели в проекте используется библиотека \textit{joblib}, которая при сериализации
     классов, использованных в составе модели, сохраняет путь импортов, а при десериализации использует эти же пути
     для восстановления модели в оперативной памяти.
-    Проблема заключается в том, что пути импортов сохраняются отностильно точки запуска скрипта сборки, или,
+    Проблема заключается в том, что пути импортов сохраняются относительно точки запуска скрипта сборки, или,
     в нашем случае, \textit{jupyter} тетрадки с кодом сборки. Соответственно, если точка входа в приложение
     будет находится в другом каталоге, импорты провалятся и приложение завершится с ошибкой.
     Размещение скриптов для сборки модели и запуска приложения в одном каталоге -- самое легкое и очевидное
     решение, в дальнейшем позволяет не отвлекаться на проблему загрузки модели во время работы над ней.
 
     \subsection{Обработчик}
-    Для обработки сообщений был реализован базовый класс \inlinecode{MessageHandler}, в котром объявлен
+    Для обработки сообщений был реализован базовый класс \inlinecode{MessageHandler}, в котором объявлен
     абстрактный метод \inlinecode{handle()} и реализован общий для входящих и исходящих сообщений
     метод \inlinecode{notify}, который рассылает уведомления всем заявленным уведомителям.
     Метод \inlinecode{handle()} содержит реализуется в виде перечня последовательных действий,
@@ -213,30 +185,28 @@ class ResponseData(SerializableMixin):
 
     В \inlinecode{IncomingHandler} это вызов сценариста для формирования ответа, отправка ответных сообщений,
     отправка уведомлений, выполнение дополнительных действий. Листинг метода представлен ниже.
-\begin{lstlisting}
-class IncomingHandler(MessageHandler):
-    def handle(self, message: IMessageData,
-               api_wrapper: ApiWrapper[IMessageData],
-               notifiers: Sequence[Type[Notifier]] = ()) -> None:
-        response = self.predict(message)
-        response.answers = self.send_answers(response.answers, api_wrapper)
-        self.notify(notifiers, message_with_prediction, response)
-        self.do_actions(response.after_answer_actions, api_wrapper)
-\end{lstlisting}
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/incomig_handler_handle.py}
+        \caption{Код класса IncomingHandler}
+        \label{fig:incomig_handler_handle}
+    \end{figure}
 
     В \inlinecode{OutgoingHandler} никаких действий кроме отправки уведомлений не требуется.
     Реализация этого класса представлена ниже.
-\begin{lstlisting}
-class OutgoingHandler(MessageHandler):
-    def handle(self, message: IMessageData,
-               notifiers: Sequence[Type[Notifier]] = ()) -> None:
-        self.notify(notifiers, message)
-\end{lstlisting}
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/outgoing_handler.py}
+        \caption{Код класса OutgoingHandler}
+        \label{fig:outgoing_handler}
+    \end{figure}
 
     \subsection*{Вывод по главе 3}
     В этой главе мы описали все реализованные нами классы и методы, объяснили принципы
-    их работы и перечислили некоторые связанные с ними нюансы. Для наглядности мы привели
-    куски кода.
+    их работы и перечислили некоторые связанные с ними нюансы.
+    Для наглядности мы привели листинги кода.
     В ходе самой разработки были решены основные проблемы, перечисленные в первой главе данной работы.
     Проект переписан с единой архитектурой для всех каналов чат-бота что улучшает понимание и поддержку
     проекта, для работы с базой теперь используется объектно-реляционная модель, что также сильно

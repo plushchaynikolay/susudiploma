@@ -2,7 +2,7 @@
     \subsection{Концептуальная модель обработки сообщений}
     Процесс обработки сообщения можно разделить на несколько этапов.
     \begin{enumerate}
-        \item Получение сообщения через интерфейс (IMAP, LongPoll Вконтакте, Телеграм-api, json-файл из POST-запроса)
+        \item Получение сообщения через интерфейс (IMAP, LongPoll ВКонтакте, telegram-api, json-файл из POST-запроса)
         \item Извлечение необходимых полей из инородной структуры данных и преобразование в обьект-сообщение внутреннего типа
         \item Классификация сообщения
         \item Формирование ответов на сообщение
@@ -20,11 +20,13 @@
     исходящих сообщений -- от пользователя, и входящих сообщений -- от оператора и бота.
     Его интерфейс очень прост -- это одна функция, которая запускает процесс получения новых сообщений.
     Выглядит интерфейс так, как представлено на листинге ниже.
-\begin{lstlisting}[language=Python]
-class ApiWorker:
-    def run(self):
-        raise NotImplementedError
-\end{lstlisting}
+
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/api_worker.py}
+        \caption{Код класса ApiWorker}
+        \label{fig:api_worker}
+    \end{figure}
 
     \subsubsection*{ApiWrapper}
     Объект, ответственный за взаимодействие с протоколами обмена сообщениями: IMAP, SMTP, VkLongPoll,
@@ -32,20 +34,14 @@ class ApiWorker:
     Он занимается превращением полученного сообщения в сообщение внутреннего формата проекта,
     обратным превращением перед отправкой сообщения пользователю и собственно отправкой.
     Его интерфейс выглядит следующим образом:
-\begin{lstlisting}[language=Python]
-class ApiWrapper:
-    @classmethod
-    def convert_from_api_message_type(cls,
-                                      api_message: Any
-                                      ) -> IMessageData:
-        raise NotImplementedError
 
-    def send_answers(self, answers: List[Answer]) -> List[Answer]:
-        ...
-
-    def send_message(self, message: MessageData) -> MessageData:
-        raise NotImplementedError
-\end{lstlisting}
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/api_wrapper.py}
+        \caption{Код класса ApiWrapper}
+        \label{fig:api_wrapper}
+    \end{figure}
+    
     Метод \inlinecode{send_answers} отправляет все ответы из списка, дополняя их
     необходимой информацией от сервера текущего канала. 
     Метод \inlinecode{send_message} отправляет одно отельное сообщения по текущему каналу,
@@ -53,60 +49,35 @@ class ApiWrapper:
     отправки, идентификатором, который сервер канала обозначил это сообщение и так далее.
 
     \subsubsection*{MessageHandler}
-    Все действия между полученем сообщения в \inlinecode{ApiWorker.run} и отправкой ответов
+    Все действия между получением сообщения в \inlinecode{ApiWorker.run} и отправкой ответов
     в \inlinecode{ApiWrapper.send_answers} и сохранением в базу будет скрывать в себе метод
     \inlinecode{MessageHandler.handle}. Для входящих сообщений от пользователя обрабатывать
     сообщения будет IncomingHandler, для исходящих от оператора и бота -- OutgoingHandler.
     Интерфейс класса MessageHandler представлен в листинге ниже.
-\begin{lstlisting}[language=Python]
-class MessageHandler:
-    @staticmethod
-    def notify(notifiers: Sequence[Type[Notifier]],
-                message: IMessageData,
-                scenarist_response: Optional[ResponseData] = None
-                ) -> None:
-        for notifier in notifiers:
-            notifier.notify(message, scenarist_response)
 
-    def handle(self,
-                message: IMessageData,
-                api_wrapper: ApiWrapper[IMessageData],
-                notifiers: Sequence[Type[Notifier]] = ()
-                ) -> None:
-        raise NotImplementedError
-\end{lstlisting}
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/message_handler.py}
+        \caption{Код класса MessageHandler}
+        \label{fig:message_handler}
+    \end{figure}
+
     Метод \inlinecode{MessageHandler.notify} здесь исполняет отправку всех уведомлений,
     которые были переданы ему. Под уведомлениями подразумеваются уведомления других служб
-    о появлении новых сообщений, базы данных, телеграм-логгера и так далее.
+    о появлении новых сообщений, базы данных, telegram-логгера и так далее.
 
     Обработчик входящих сообщений, IncomingHandler, также должен вырабатывать ответ
     к входящему сообщению. Эту задачу он делегирует другому классу -- Scenarist.
     Дополнительно IncomingHandler может исполнять некоторые действия,
     в зависимости от выбранного сценария.
     Общий вид класса IncomingHandler представлен на листинге ниже.
-\begin{lstlisting}[language=Python]
-class IncomingHandler(MessageHandler):
-    def __init__(self, scenarist: IScenarist[IMessageData]):
-        self.scenarist: IScenarist[IMessageData] = scenarist
 
-    def predict(self, message: IMessageData) -> ResponseData:
-        ...
-
-    @classmethod
-    def send_answers(cls,
-                     answers: List[Answer],
-                     api_wrapper: ApiWrapper[IMessageData]
-                     ) -> List[Answer]:
-        ...
-
-    @classmethod
-    def do_actions(cls,
-                   actions: Iterable[Action], 
-                   api_wrapper: ApiWrapper[IMessageData]
-                   ) -> None:
-        for action in actions:
-            action.do(api_wrapper)
-\end{lstlisting}
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/incoming_handler.py}
+        \caption{Код класса IncomingHandler}
+        \label{fig:incoming_handler}
+    \end{figure}
 
     \subsubsection*{Прочие компоненты}
     IScenarist -- интерфейс сценариста, обладает только одним методом:\\
@@ -145,8 +116,8 @@ class IncomingHandler(MessageHandler):
     % \end{figure}
 
     \subsection*{Вывод по главе 2}
-    В этой главе мы сформулировали основную концепцию нашей будующей системы, описали основные
+    В этой главе мы сформулировали основную концепцию нашей будущей системы, описали основные
     её сущности и способы их взаимодействия. Мы в коде описали сигнатуры их публичных методов базовых
     классов.
-    % , и изобралили основные классы и процессы на диаграммах.
+    % , и изобразили основные классы и процессы на диаграммах.
     Теперь, мы можем приступать к их реализации в каждом конкретном канале.
