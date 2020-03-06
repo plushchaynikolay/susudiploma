@@ -33,8 +33,12 @@
 \usepackage{indentfirst}
 \parindent=1cm
 
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+
 \begin{document}
-    % \include{src/title}
+    \include{src/title}
+    \include{src/task}
     \tableofcontents
     
     % введение
