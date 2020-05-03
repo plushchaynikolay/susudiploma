@@ -2,7 +2,7 @@ class ApiWrapper:
     @classmethod
     def convert_from_api_message_type(cls,
                                       api_message: Any
-                                      ) -> IMessageData:
+                                      ) -> MessageData:
         raise NotImplementedError
 
     def send_answers(self, answers: List[Answer]) -> List[Answer]:

@@ -1,6 +1,6 @@
 class IncomingHandler(MessageHandler):
-    def handle(self, message: IMessageData,
-               api_wrapper: ApiWrapper[IMessageData],
+    def handle(self, message: MessageData,
+               api_wrapper: ApiWrapper[MessageData],
                notifiers: Sequence[Type[Notifier]] = ()) -> None:
         response = self.predict(message)
         response.answers = self.send_answers(response.answers, api_wrapper)

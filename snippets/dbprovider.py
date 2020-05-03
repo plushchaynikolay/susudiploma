@@ -1,4 +1,4 @@
-class DBProvider:
+class DataBaseProvider:
     def get_history(cls, chat_id: str, 
                     columns: Iterable[str]) -> Optional[History]: ...
     def _load_history(chat_id: str, 

@@ -32,7 +32,7 @@
 
     \subsection{Работа с базой}
     В работе с базой данных участвуют две сущности: объектно-реляционная модель Message
-    и класс инкапсулирующий работу с базой DBProvider.
+    и класс инкапсулирующий работу с базой DataBaseProvider.
 
     \newpage
     Модель Message выглядит следующим образом:
@@ -44,15 +44,15 @@
         \label{fig:message_model}
     \end{figure}
 
-    DBProvider -- это довольно большой статический класс, реализующий как получение истории сообщений,
+    DataBaseProvider -- это довольно большой статический класс, реализующий как получение истории сообщений,
     так и сохранение новых сообщений в базу.
     Структура класса приведена на листинге ниже.
 
     \begin{figure}[!h]
         \centering
         \lstinputlisting[language=Python]{snippets/dbprovider.py}
-        \caption{Код класса DBProvider}
-        \label{fig:dbprovider}
+        \caption{Код класса DataBaseProvider}
+        \label{fig:DataBaseProvider}
     \end{figure}
 
     Рассмотрим подробнее методы этого класса:

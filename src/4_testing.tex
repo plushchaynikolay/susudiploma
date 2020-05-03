@@ -1,4 +1,9 @@
 \section{ТЕСТИРОВАНИЕ}
+    \subsection{Статический анализ}
+    Для статического анализа в Python используются аннотации типов из встроенного 
+    модуля \inlinecode{typing} и анализатор. Существует несколько анализаторов,
+    \textit{mypy} - наиболее популярный, написан на Python, поддерживается и
+    развивается сообществом и Гвидо ван Россумом в частности
     \subsection{Юнит-тесты}
 
 
@@ -11,19 +16,12 @@
     увеличением количества запросов.
 
     Так, был составлен следующий конфигурационный файл для Яндекс.Танка:
-    \begin{lstlisting}
-# load.yaml
-phantom:
-    address: alisa.napoleonit.ru:443
-    ammofile: ./ammo.txt
-    timeout: 31s
-    ssl: true
-    load_profile:
-        load_type: rps 
-        schedule: const(20, 1m)
-console:
-    enabled: true 
-    \end{lstlisting}
+    \begin{figure}[!h]
+        \centering
+        \lstinputlisting[language=Python]{snippets/load.yaml}
+        \caption{Конфигурационный файл Яндекс.Танка}
+        \label{fig:tank_load}
+    \end{figure}
 
     Так, было установлено, что сервис стабильно выдерживает нагрузку до 18
     запросов в секунду в течение 2 минут.

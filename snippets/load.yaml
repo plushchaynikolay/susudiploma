@@ -1,0 +1,10 @@
+phantom:
+  address: alisa.napoleonit.ru:443
+  ammofile: ./ammo.txt
+  timeout: 31s
+  ssl: true
+  load_profile:
+    load_type: rps 
+    schedule: const(20, 1m)
+console:
+  enabled: true 
