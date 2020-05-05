@@ -34,7 +34,7 @@
     для работы с каналами. Обладает одним методом, который запускает процесс 
     получения новых сообщений. Его код представлен на листинге ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/api_worker.py}
         \caption{Код класса ApiWorker}
@@ -47,7 +47,7 @@
     сообщения пользователю и непосредственную отправку.
     Его интерфейс выглядит следующим образом:
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/api_wrapper.py}
         \caption{Код класса ApiWrapper}
@@ -77,7 +77,7 @@
     сообщения будет IncomingHandler, для исходящих от оператора и бота -- OutgoingHandler.
     Интерфейс класса MessageHandler представлен в листинге ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/message_handler.py}
         \caption{Код класса MessageHandler}
@@ -93,7 +93,7 @@
     действия, в зависимости от выбранного сценария.
     Общий вид класса IncomingHandler представлен на листинге ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/incoming_handler.py}
         \caption{Код класса IncomingHandler}
@@ -119,7 +119,8 @@
     Сам процесс обработки одного сообщения изобразим на диаграмме процессов.
 
     Диаграмма классов представлена на рисунке ниже.
-    \begin{figure}[!h]
+
+    \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{static/ClassDiagram.png}
         \caption{Диаграмма классов проекта}
@@ -127,7 +128,7 @@
     \end{figure}
 
     % Диаграмма процесса обработки сообщения представлена на рисунке ниже.
-    % \begin{figure}[!h]
+    % \begin{figure}[H]
     %     \centering
     %     % TODO Диаграмма процесса
     %     % \includegraphics[width=\linewidth]{}

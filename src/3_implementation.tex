@@ -15,7 +15,7 @@
     \end{itemize}
     Пример реализации сохранения в базу представлен на листинге ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/data_base_message_notifier.py}
         \caption{Код класса DataBaseMessageNotifier}
@@ -24,7 +24,7 @@
 
     Сама Celery-задача выглядит следующим образом:
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/celery_task.py}
         \caption{Код метода-задачи Celery save\_to\_db}
@@ -38,7 +38,7 @@
     \newpage
     Модель Message выглядит следующим образом:
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/message_model.py}
         \caption{Код ОРМ класса Message}
@@ -49,7 +49,7 @@
     так и сохранение новых сообщений в базу.
     Структура класса приведена на листинге ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/dbprovider.py}
         \caption{Код класса DataBaseProvider}
@@ -85,7 +85,7 @@
         идентификатор чата, название канала-источника, время получения, отправителя,
         список классифицированных категорий, а также некоторые флаги и идентификаторы.
 
-        \begin{figure}[!h]
+        \begin{figure}[H]
             \centering
             \lstinputlisting[language=Python]{snippets/messagedata.py}
             \caption{Код класса MessageData}
@@ -94,7 +94,7 @@
 
         \item \inlinecode{Answer} -- контейнер с ответом бота на входящее сообщение.
 
-        \begin{figure}[!h]
+        \begin{figure}[H]
             \centering
             \lstinputlisting[language=Python]{snippets/answer.py}
             \caption{Код класса Answer}
@@ -104,7 +104,7 @@
         \item \inlinecode{Prediction} -- контейнер с результатами классификации текста сообщения,
         которые возвращает классификатор.
 
-        \begin{figure}[!h]
+        \begin{figure}[H]
             \centering
             \lstinputlisting[language=Python]{snippets/prediction.py}
             \caption{Код класса Prediction}
@@ -114,7 +114,7 @@
         \item \inlinecode{ResponseData} -- датакласс со всем, что нужно боту, чтобы корректно
         среагировать на входящее сообщение пользователя.
 
-        \begin{figure}[!h]
+        \begin{figure}[H]
             \centering
             \lstinputlisting[language=Python]{snippets/responsedata.py}
             \caption{Код класса ResponseData}
@@ -187,7 +187,7 @@
     В \inlinecode{IncomingHandler} это вызов сценариста для формирования ответа, отправка ответных сообщений,
     отправка уведомлений, выполнение дополнительных действий. Листинг метода представлен ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/incomig_handler_handle.py}
         \caption{Код класса IncomingHandler}
@@ -197,7 +197,7 @@
     В \inlinecode{OutgoingHandler} никаких действий кроме отправки уведомлений не требуется.
     Реализация этого класса представлена ниже.
 
-    \begin{figure}[!h]
+    \begin{figure}[H]
         \centering
         \lstinputlisting[language=Python]{snippets/outgoing_handler.py}
         \caption{Код класса OutgoingHandler}
