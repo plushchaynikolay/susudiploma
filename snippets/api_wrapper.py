@@ -1,7 +1,6 @@
 class ApiWrapper:
     @classmethod
-    def convert_from_api_message_type(cls,
-                                      api_message: Any
+    def convert_from_api_message_type(cls, api_message: Any
                                       ) -> MessageData:
         raise NotImplementedError
 

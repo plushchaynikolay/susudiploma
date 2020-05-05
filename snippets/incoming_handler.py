@@ -7,12 +7,11 @@ class IncomingHandler(MessageHandler):
 
     @classmethod
     def send_answers(cls, answers: List[Answer],
-                     api_wrapper: ApiWrapper[MessageData]
-                     ) -> List[Answer]:
+                     api_wrapper: ApiWrapper[MessageData]) -> List[Answer]:
         ...
 
     @classmethod
-    def do_actions(cls, actions: Iterable[Action], 
+    def do_actions(cls, actions: Iterable[Action],
                    api_wrapper: ApiWrapper[MessageData]) -> None:
         for action in actions:
             action.do(api_wrapper)
