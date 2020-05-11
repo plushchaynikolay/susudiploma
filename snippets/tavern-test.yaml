@@ -1,0 +1,25 @@
+stages:
+  - name: classified request
+
+    request:
+      url: "http://127.0.0.1:5000/api/"
+      method: POST
+      json:
+        id: 1488
+        text: "Test text"
+        chatId: 1488
+        source: "mobile"
+        date: "2019-04-24T15:19:21+03:00"
+      headers:
+        content-type: application/json
+
+    response:
+      status_code: 200
+      body:
+        type: "answer"
+        data:
+          - text: "Test answer"
+            categories: [{
+                'id': 13,
+                'name': "Category name"
+            }]
