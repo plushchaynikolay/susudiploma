@@ -1,0 +1,33 @@
+----- coverage: platform linux, python 3.8.2-final-0 ------
+Name                                    Stmts   Miss  Cover
+-----------------------------------------------------------
+src/chat_bot/__init__.py                    0      0   100%
+src/chat_bot/actions.py                    13      2    85%
+src/chat_bot/admin.py                      50     20    60%
+src/chat_bot/apps.py                        3      0   100%
+src/chat_bot/database.py                   70      2    97%
+src/chat_bot/external_api/__init__.py       0      0   100%
+src/chat_bot/external_api/api_wrapper.py   22      4    82%
+src/chat_bot/external_api/email.py        273     34    88%
+src/chat_bot/external_api/handlers.py      57      2    96%
+src/chat_bot/external_api/telegram.py      59     17    71%
+src/chat_bot/external_api/vk.py            77     21    73%
+src/chat_bot/external_api/xpage.py        118     16    86%
+src/chat_bot/historian.py                  13      3    77%
+src/chat_bot/message/__init__.py            0      0   100%
+src/chat_bot/message/messagedata.py        38      0   100%
+src/chat_bot/message/prediction.py          7      0   100%
+src/chat_bot/message/response.py           23      3    87%
+src/chat_bot/models.py                     44      0   100%
+src/chat_bot/notifiers.py                  29     10    66%
+...
+src/chat_bot/tasks.py                      49     13    73%
+src/chat_bot/telegramlogger.py             42      0   100%
+src/chat_bot/urls.py                        3      0   100%
+src/chat_bot/utils/__init__.py              0      0   100%
+src/chat_bot/utils/filters.py              21     11    48%
+src/chat_bot/utils/mixins.py               59      2    97%
+src/chat_bot/utils/utils.py                50      1    98%
+src/chat_bot/views.py                      32      9    72%
+-----------------------------------------------------------
+TOTAL                                    2982    621    79%

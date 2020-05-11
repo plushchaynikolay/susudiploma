@@ -13,3 +13,5 @@ example
 html/
 *.html
 *.css
+*.json
+.ipynb_checkpoints/
