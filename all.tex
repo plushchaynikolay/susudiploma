@@ -1,7 +1,7 @@
 \documentclass[14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
-\usepackage[backend=biber,style=numeric]{biblatex}
+\usepackage[backend=biber,style=gost-numeric]{biblatex}
 \addbibresource{src/bibliography.bib}
 \usepackage{geometry}
 \geometry{
@@ -61,7 +61,6 @@
 
     % литература
     \nocite{*}
-    % FIXME стиль списка литературы
     \addcontentsline{toc}{section}{Библиографический список}
     \printbibliography[title={Библиографический список}]
 

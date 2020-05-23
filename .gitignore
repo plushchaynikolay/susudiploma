@@ -16,3 +16,5 @@ html/
 *.json
 .ipynb_checkpoints/
 *.djvu
+.~*
+*.docx
