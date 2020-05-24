@@ -1,6 +1,7 @@
 \documentclass[14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+\usepackage[labelfont=bf]{caption}
 \usepackage[backend=biber,style=gost-numeric]{biblatex}
 \addbibresource{src/bibliography.bib}
 \usepackage{geometry}
@@ -34,16 +35,25 @@
 \usepackage{indentfirst}
 \parindent=1cm
 
+% Изменение стилей нумераций списков
 \renewcommand{\labelenumii}{\theenumii}
 \renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
 
 \usepackage{mathtools}
 
 \begin{document}
+    % Изменение стилей нумераций таблиц и рисунков
+    \captionsetup{labelsep=space}
+    \renewcommand{\tablename}{\textbf{Табл.}}
+    \renewcommand{\thetable}{\arabic{table}.}
+    \renewcommand{\figurename}{\textbf{Рис.}}
+    \renewcommand{\thefigure}{\arabic{figure}.}
+
     \include{src/title}
     \include{src/task}
+    \renewcommand{\contentsname}{ОГЛАВЛЕНИЕ}
     \tableofcontents
-    
+
     % введение
     \include{src/0_intorduction}
     % анализ предметной области
@@ -61,7 +71,7 @@
 
     % литература
     \nocite{*}
-    \addcontentsline{toc}{section}{Библиографический список}
-    \printbibliography[title={Библиографический список}]
+    \addcontentsline{toc}{section}{Литература}
+    \printbibliography[title={Литература}]
 
 \end{document}
