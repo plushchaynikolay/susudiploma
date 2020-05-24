@@ -8,5 +8,3 @@ class MessageData(SerializableMixin):
     is_answered: Optional[bool] = None
     categories: List[int] = field(default_factory=list)
     prediction: Optional[Dict[str, float]] = None
-    source_message_id: Optional[str] = None
-    source_chat_id: Optional[str] = None
