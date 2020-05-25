@@ -5,6 +5,6 @@ phantom:
   ssl: true
   load_profile:
     load_type: rps 
-    schedule: const(20, 1m)
+    schedule: const(20, 2m)
 console:
   enabled: true 
