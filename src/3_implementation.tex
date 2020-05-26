@@ -173,9 +173,18 @@
     с json-объектом, содержащим идентификатор чата, имя канала, текст и дату сообщения.
     В ответ возвращается json-объект с массивом ответов -- объектов класса \inlinecode{Answer}.
     Это единственный канал, в который работает не через \inlinecode{ApiWorker.run},
-    а через собственный класс \inlinecode{ApiManager}, который предоставляет
+    потому что не использует внешний API, а предоставляет его.
+    Вместо этого канал работает через класс \inlinecode{ApiManager}, который имеет
     единственный метод \inlinecode{ApiManager.handle_message}. Этот метод, в отличие от
     \inlinecode{ApiWorker.run} принимает json-объект сообщения и возвращает также json-объект ответа.
+    Примеры этих объектов приведены на рисунке 14.
+    \begin{figure}[H]
+        \centering
+        \lstinputlisting[language=Python]{snippets/request.json}
+        \lstinputlisting[language=Python]{snippets/response.json}
+        \caption{Примеры запроса (сверху) и ответа (снизу)}
+        \label{fig:json-req-resp}
+    \end{figure}
     То есть, в этом канале не используется метод \inlinecode{ApiWrapper.send_message},
     так как ответ на сообщение пользователя возвращается в ответ на запрос незамедлительно.
 

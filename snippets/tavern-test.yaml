@@ -5,11 +5,11 @@ stages:
       url: "http://127.0.0.1:5000/api/"
       method: POST
       json:
-        id: 1488
-        text: "Test text"
-        chatId: 1488
-        source: "mobile"
-        date: "2019-04-24T15:19:21+03:00"
+        chat: 1488
+        source: "site"
+        sender: "user"
+        datetime: "2019-04-24T15:19:21+03:00"
+        text: "привет"
       headers:
         content-type: application/json
 
@@ -18,8 +18,8 @@ stages:
       body:
         type: "answer"
         data:
-          - text: "Test answer"
+          - text: "Здравствуйте! Какой у Вас вопрос?"
             categories: [{
                 'id': 13,
-                'name': "Category name"
+                'name': "Сообщение без смысла"
             }]
