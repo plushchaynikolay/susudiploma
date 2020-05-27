@@ -21,6 +21,7 @@
 \fancyfoot{} % clear footer
 \fancyfoot[LE,RO]{\thepage}
 
+% Листинги
 \usepackage{listings}
 \lstset{
     basicstyle=\footnotesize\ttfamily,
@@ -28,11 +29,14 @@
     tabsize=4,
     extendedchars=\true
 }
+% Строчные вставки кода
 \newcommand{\inlinecode}{\lstinline[basicstyle=\normalsize\ttfamily]}
 
+% Графика
 \usepackage{graphicx}
 \usepackage{float}
 
+% Фикс отступов
 \usepackage{indentfirst}
 \parindent=1cm
 
@@ -40,7 +44,15 @@
 \renewcommand{\labelenumii}{\theenumii}
 \renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
 
+% Математические формулы
 \usepackage{mathtools}
+
+% Стили оглавления
+\usepackage{tocloft}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+\cftsetindents{subsection}{0.5in}{0.5in}
+\cftsetindents{subsubsection}{0.5in}{0.5in}
 
 \begin{document}
     % Изменение стилей нумераций таблиц и рисунков
