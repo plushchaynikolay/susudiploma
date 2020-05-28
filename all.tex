@@ -66,21 +66,21 @@
     \renewcommand{\thefigure}{\arabic{figure}.}
 
     \include{src/title}
-    \include{src/task}
-    \renewcommand{\contentsname}{ОГЛАВЛЕНИЕ}
-    \tableofcontents
-    \thispagestyle{empty}
-    \setcounter{page}{2}
+    % \include{src/task}
+    % \renewcommand{\contentsname}{ОГЛАВЛЕНИЕ}
+    % \tableofcontents
+    % \thispagestyle{empty}
+    % \setcounter{page}{2}
     
     \begin{onehalfspace}
     % введение
     \include{src/0_intorduction}
     % анализ предметной области
-    \include{src/1_background}
+    % \include{src/1_background}
     % проектирование
-    \include{src/2_design}
+    % \include{src/2_design}
     % реализация
-    \include{src/3_implementation}
+    % \include{src/3_implementation}
     % тестирование
     \include{src/4_testing}
     % сравнительный анализ сложности проектов
@@ -90,7 +90,7 @@
     \end{onehalfspace}
     
     % литература
-    \nocite{*}
+    % \nocite{*}
     \addcontentsline{toc}{section}{ЛИТЕРАТУРА}
     \printbibliography[title={ЛИТЕРАТУРА}]
 
