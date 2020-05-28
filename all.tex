@@ -19,7 +19,7 @@
 \renewcommand\headrulewidth{0pt} % no line between document and header
 \fancyhead{} % clear header
 \fancyfoot{} % clear footer
-\fancyfoot[LE,RO]{\thepage}
+\fancyfoot[R]{\thepage}
 
 % Листинги
 \usepackage{listings}
@@ -38,7 +38,7 @@
 
 % Фикс отступов
 \usepackage{indentfirst}
-\parindent=1cm
+\parindent=1.25cm
 
 % Изменение стилей нумераций списков
 \renewcommand{\labelenumii}{\theenumii}
@@ -54,6 +54,9 @@
 \cftsetindents{subsection}{0.5in}{0.5in}
 \cftsetindents{subsubsection}{0.5in}{0.5in}
 
+% Отступы
+\usepackage{setspace}
+
 \begin{document}
     % Изменение стилей нумераций таблиц и рисунков
     \captionsetup{labelsep=space}
@@ -66,7 +69,10 @@
     \include{src/task}
     \renewcommand{\contentsname}{ОГЛАВЛЕНИЕ}
     \tableofcontents
-
+    \thispagestyle{empty}
+    \setcounter{page}{2}
+    
+    \begin{onehalfspace}
     % введение
     \include{src/0_intorduction}
     % анализ предметной области
@@ -81,7 +87,8 @@
     \include{src/5_analisys}
     % заключение
     \include{src/6_conclusion}
-
+    \end{onehalfspace}
+    
     % литература
     \nocite{*}
     \addcontentsline{toc}{section}{ЛИТЕРАТУРА}
