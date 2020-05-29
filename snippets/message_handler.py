@@ -1,6 +1,6 @@
 class MessageHandler:
     @staticmethod
-    def notify(notifiers: Sequence[Type[Notifier]],
+    def send_notifications(notifiers: Sequence[Type[Notifier]],
                 message: MessageData,
                 scenarist_response: Optional[ResponseData] = None
                 ) -> None:
