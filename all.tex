@@ -1,8 +1,10 @@
 \documentclass[14pt,oneside]{extarticle}
 \usepackage[utf8]{inputenc}
-\usepackage[english,russian]{babel}
+\usepackage[english,main=russian]{babel}
 \usepackage[labelfont=bf]{caption}
 \usepackage[backend=biber,style=gost-numeric]{biblatex}
+% Отключает тире в разделителе
+\renewcommand*{\newblockpunct}{\addperiod\space\bibsentence}
 \addbibresource{src/bibliography.bib}
 \usepackage{geometry}
 \geometry{
